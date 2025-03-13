@@ -53,7 +53,8 @@ class BeatMachine extends HTMLElement {
           padding: 0;
         }
         #playButton {
-          width: 32px;
+          min-width: 32px;
+          max-width: 32px;
           height: 32px;
           border: 1px solid #ccc;
           background: #f0f0f0;
