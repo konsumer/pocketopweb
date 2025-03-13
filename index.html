@@ -1,0 +1,81 @@
+<html>
+  <title>Pocket Operations</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    canvas {
+      margin-top: 1em;
+      margin-bottom: 0.5em;
+    }
+  </style>
+</html>
+<body>
+
+<label for="beat">Choose a beat:</label>
+<select id="beat">
+</select>
+<canvas id="canvas"></canvas>
+
+<beat-machine id="player"></beat-machine>
+
+</body>
+<script type="module">
+import  './beat-machine.js'
+
+async function updatePattern(pattern) {
+  const ctx = document.getElementById('canvas').getContext("2d")
+  ctx.canvas.width = (32 * 50) + 50
+  const pi = Object.keys(pattern)
+  ctx.canvas.height = 32 * pi.length
+  ctx.strokeStyle = '#ccc'
+  for (const c in pi) {
+    ctx.fillStyle = 'black'
+    ctx.fillText(pi[c], 0, (c*32) + 18)
+    for (let n=0;n<16;n++) {
+      if (pattern[pi[c]].includes(n+1)) {
+        ctx.fillStyle = 'black'
+        ctx.fillRect((n+1)*32, 32*c, 32, 32)
+      }
+      ctx.strokeRect((n+1)*32, 32*c, 32, 32)
+    }
+  }
+  beatMachine.updatePattern(pattern)
+}
+
+const beatMachine = document.getElementById('player')
+
+const patterns = await fetch('patterns.json').then(r => r.json())
+
+const inames = ['BD', 'CY', 'RS', 'CH', 'CB', 'SN', 'OH', 'AC', 'HT', 'LT', 'MT', 'CL', 'SH'] // 'OHR', 'CHR', 'SNR'
+const instruments = {}
+for (let i of inames) {
+  instruments[i] = new Audio(`samples/${i}.wav`)
+}
+beatMachine.instruments = instruments
+beatMachine.tempo = 120
+
+const s = document.getElementById('beat')
+
+s.addEventListener('change', e => {
+  const [fname, pname] = e.target.value.split('|')
+  updatePattern(patterns[fname][pname])
+})
+
+for (let fname of Object.keys(patterns)) {
+  const o = document.createElement('optgroup')
+  o.label = fname
+  for (const pname of Object.keys(patterns[fname])) {
+    const op = document.createElement('option')
+    op.innerText = pname
+    op.value = `${fname}|${pname}`
+    o.appendChild(op)
+  }
+  s.appendChild(o)
+}
+s.value = `Basic Patterns|Boots N' Cats`
+const evt = document.createEvent("HTMLEvents")
+evt.initEvent("change", false, true)
+s.dispatchEvent(evt)
+
+</script>
