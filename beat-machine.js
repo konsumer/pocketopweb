@@ -151,9 +151,24 @@ class BeatMachine extends HTMLElement {
     
     // Play all instruments that have this step in their pattern
     Object.entries(this.pattern).forEach(([instrument, steps]) => {
-      if (steps.includes(stepNumber) && this.instruments[instrument]) {
+      if (steps.includes(stepNumber)) {
         // Schedule the sound precisely using Web Audio API
-        this.playSound(this.instruments[instrument], time);
+        if (this.instruments[instrument]) {
+          this.playSound(this.instruments[instrument], time);
+        }
+        
+        // handle "rolling" instruments (smaller than 16th notes, fit to 1/16 beat)
+        if (instrument.endsWith('R')) {
+          // Calculate time for next step based on tempo
+          const secondsPerBeat = 60.0 / this.tempo;
+          const secondsPerStep = secondsPerBeat / 4; // 16th notes (4 steps per beat)
+          const rollTime = secondsPerStep / 4
+          const rollAmount = 4
+          let i = rollAmount;
+          while (i--) {
+            this.playSound(this.instruments[instrument.substr(0, 2)], time + (rollTime * i));
+          }
+        }
       }
     });
   }
