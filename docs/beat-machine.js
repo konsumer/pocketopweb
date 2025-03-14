@@ -151,7 +151,7 @@ class BeatMachine extends HTMLElement {
           <div class="step-container">
             <div class="step-indicators">
               ${Array(this.stepCount).fill(0).map((_, i) => 
-                `<div class="step ${newPattern[inst].includes(i+1) ? 'on' : 'off'}">${i+1}</div>`
+                `<div class="step ${newPattern[inst].includes(i+1) ? `on">${i+1}` : 'off">'}</div>`
               ).join('')}
             </div>
           </div>
