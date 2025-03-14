@@ -7,7 +7,6 @@ const patterns = JSON.parse(await readFile('docs/patterns.json'))
 
 // map letters in book to General MIDI notes
 // https://www.zendrum.com/resource-site/drumnotes.htm
-// intruments with ? need to be checked on
 const instruments = {
   BD: 36, // Bass Drum 1
   SN: 38, // Acoustic Snare
@@ -19,6 +18,8 @@ const instruments = {
   MT: 47, // Low-Mid Tom
   HT: 50, // High Tom
   OH: 46, // Open Hi-Hat
+
+  // these should be double-checked
   SH: 70, // Maracas?
   RS: 53, // Ride Bell?
   AC: 69 // Cabasa?
@@ -28,31 +29,32 @@ const instruments = {
 const safeId = str => String(str).replace(/[^a-z0-9\-_]/gi, '_').toLowerCase()
 
 // take a pattermn & turn it into MIDI
-function patternTMidi (pattern) {
+function patternToMidi (pattern) {
   const file = new Midi.File()
   const tracks = {}
   for (const i of Object.keys(pattern)) {
     tracks[i] = new Midi.Track()
     file.addTrack(tracks[i])
+    tracks[i].setTempo(120)
   }
 
   for (let n = 0; n < 16; n++) {
     for (const i of Object.keys(pattern)) {
       // handle "Rolls"
       if (i.endsWith('R')) {
-        if (instruments[i] && pattern[i]?.includes(n + 1)) {
-          tracks[i].addNote(9, instruments[i], 16)
-          tracks[i].addNote(9, instruments[i], 16)
-          tracks[i].addNote(9, instruments[i], 16)
-          tracks[i].addNote(9, instruments[i], 16)
+        const r = i.replace(/R$/, '')
+        if (pattern[i]?.includes(n + 1)) {
+          tracks[i].addNote(9, Midi.Util.noteFromMidiPitch(instruments[r]), 16)
+          tracks[i].addNote(9, Midi.Util.noteFromMidiPitch(instruments[r]), 16)
+          tracks[i].addNote(9, Midi.Util.noteFromMidiPitch(instruments[r]), 16)
         } else {
-          tracks[i].addNote(9, 0, 64)
+          tracks[i].addNoteOff(9, Midi.Util.noteFromMidiPitch(instruments[i]), 64)
         }
       } else {
         if (instruments[i] && pattern[i]?.includes(n + 1)) {
           tracks[i].addNote(9, instruments[i], 64)
         } else {
-          tracks[i].addNote(9, 0, 64)
+          tracks[i].addNoteOff(9, Midi.Util.noteFromMidiPitch(instruments[i]), 64)
         }
       }
     }
@@ -61,13 +63,16 @@ function patternTMidi (pattern) {
   return file.toBytes()
 }
 
-const info = {}
+let sel = '<select id="beat">\n'
 for (const t of Object.keys(patterns)) {
-  info[t] = {}
+  sel += `  <optgroup label=${JSON.stringify(t)}>\n`
   for (const i of Object.keys(patterns[t])) {
-    info[t][i] = `${safeId(t)}-${safeId(i)}`
-    await writeFile(`docs/mid/${info[t][i]}.mid`, patternTMidi(patterns[t][i]), 'binary')
+    const f = `${safeId(t)}-${safeId(i)}`
+    sel += `    <option value=${JSON.stringify(f)}>${i}</option>\n`
+    await writeFile(`docs/mid/${f}.mid`, patternToMidi(patterns[t][i]), 'binary')
   }
+  sel += '  </optgroup>\n'
 }
+sel += '</select>'
 
-console.log(JSON.stringify(info, null, 2))
+// console.log(sel)
