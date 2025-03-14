@@ -89,21 +89,27 @@ class BeatMachine extends HTMLElement {
           justify-content: center;
           font-size: 12px;
           background: transparent;
+          color: white;
+        }
+        .step.inst {
           color: black;
         }
         .step.on {
           background: black;
+
         }
         .step.off {
           background: white;
+          color: white;
         }
         .step.active {
           background: rgba(0,0,0,0.15);
           border-color: #333;
           font-weight: bold;
         }
-
-        .CHR .step.on, .OHR .step.on, .SNR .step.on   {
+        .CHR .step.on,
+        .OHR .step.on,
+        .SNR .step.on {
           background-image: linear-gradient(90deg, #000 25%, transparent 25%, transparent 50%, #000 50%, #000 75%, transparent 75%, #fff);
           background-size: 8px;
         }
@@ -113,9 +119,7 @@ class BeatMachine extends HTMLElement {
         <div class="step-container">
           <div class="step-indicators">
             ${Array(this.stepCount).fill(0).map((_, i) => 
-              `<div class="step" id="step-${i}">
-                ${i.toString(16).toUpperCase()}
-               </div>`
+              `<div class="step" id="step-${i}"></div>`
             ).join('')}
           </div>
         </div>
@@ -143,11 +147,11 @@ class BeatMachine extends HTMLElement {
     o.innerHTML = ''
     for (const inst of Object.keys(newPattern)) {
       o.innerHTML += `<div class="container ${inst}">
-          <div class="step">${inst}</div>
+          <div class="step inst">${inst}</div>
           <div class="step-container">
             <div class="step-indicators">
               ${Array(this.stepCount).fill(0).map((_, i) => 
-                `<div class="step ${newPattern[inst].includes(i+1) ? 'on' : 'off'}"></div>`
+                `<div class="step ${newPattern[inst].includes(i+1) ? 'on' : 'off'}">${i+1}</div>`
               ).join('')}
             </div>
           </div>
