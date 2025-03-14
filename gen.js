@@ -63,16 +63,22 @@ function patternToMidi (pattern) {
   return file.toBytes()
 }
 
-let sel = '<select id="beat">\n'
 for (const t of Object.keys(patterns)) {
-  sel += `  <optgroup label=${JSON.stringify(t)}>\n`
   for (const i of Object.keys(patterns[t])) {
     const f = `${safeId(t)}-${safeId(i)}`
-    sel += `    <option value=${JSON.stringify(f)}>${i}</option>\n`
-    await writeFile(`docs/mid/${f}.mid`, patternToMidi(patterns[t][i]), 'binary')
+    await writeFile(`mid/${f}.mid`, patternToMidi(patterns[t][i]), 'binary')
   }
-  sel += '  </optgroup>\n'
 }
-sel += '</select>'
+
+// let sel = '<select id="beat">\n'
+// for (const t of Object.keys(patterns)) {
+//   sel += `  <optgroup label=${JSON.stringify(t)}>\n`
+//   for (const i of Object.keys(patterns[t])) {
+//     const f = `${safeId(t)}-${safeId(i)}`
+//     sel += `    <option value=${JSON.stringify(f)}>${i}</option>\n`
+//   }
+//   sel += '  </optgroup>\n'
+// }
+// sel += '</select>'
 
 // console.log(sel)
