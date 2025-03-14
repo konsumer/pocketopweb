@@ -1,8 +1,13 @@
 {
   "name": "pocketopweb",
   "version": "0.0.0",
+  "type": "module",
   "private": true,
   "scripts": {
-    "start": "npx -y live-server --mount=/patterns.json:./patterns.json docs"
+    "start": "npx -y live-server docs"
+  },
+  "devDependencies": {
+    "jsmidgen": "^0.1.5",
+    "standard": "^17.1.2"
   }
 }
