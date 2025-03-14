@@ -3,6 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "npx -y live-server"
+    "start": "npx -y live-server --mount=/patterns.json:./patterns.json docs"
   }
 }
